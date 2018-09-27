@@ -25,8 +25,10 @@ import {
 /*
  TODO: Insert your API key below
  */
+import { API_KEY } from './keys';
+
 var sharedProps = {
-  apiKey:"API_KEY_HERE",
+  apiKey:API_KEY,
 }
 
 // Sets the default scene you want for AR and VR
@@ -59,13 +61,7 @@ export default class ViroSample extends Component {
   // Replace this function with the contents of _getVRNavigator() or _getARNavigator()
   // if you are building a specific type of experience.
   render() {
-    if (this.state.navigatorType == UNSET) {
-      return this._getExperienceSelector();
-    } else if (this.state.navigatorType == VR_NAVIGATOR_TYPE) {
-      return this._getVRNavigator();
-    } else if (this.state.navigatorType == AR_NAVIGATOR_TYPE) {
-      return this._getARNavigator();
-    }
+    return this._getARNavigator()
   }
 
   // Presents the user with a choice of an AR or VR experience

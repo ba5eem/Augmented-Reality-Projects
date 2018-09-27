@@ -8,7 +8,19 @@ import {
   ViroARScene,
   ViroText,
   ViroConstants,
+  ViroARTrackingTargets,
+  ViroARObjectMarker,
+  ViroBox,
+  ViroImage
 } from 'react-viro';
+
+
+ViroARTrackingTargets.createTargets({
+    "drone" : {
+      source : require('../assets/objects/drone.arobject'),
+      type : 'Object',
+    },
+  });
 
 export default class HelloWorldSceneAR extends Component {
 
@@ -24,10 +36,20 @@ export default class HelloWorldSceneAR extends Component {
     this._onInitialized = this._onInitialized.bind(this);
   }
 
+
+  
+
   render() {
     return (
       <ViroARScene onTrackingUpdated={this._onInitialized} >
-        <ViroText text={this.state.text} scale={[.5, .5, .5]} position={[0, 0, -1]} style={styles.helloWorldTextStyle} />
+        <ViroARObjectMarker target={"drone"} >
+          <ViroImage
+            height={2}
+            width={2}
+            scale={[.1, .1, .1]}
+            position={[0, .25, 0]}
+            source={require("../assets/logo.png")}/>
+        </ViroARObjectMarker>
       </ViroARScene>
     );
   }
