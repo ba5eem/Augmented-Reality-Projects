@@ -11,16 +11,14 @@ import {
   ViroARTrackingTargets,
   ViroARObjectMarker,
   ViroBox,
-  ViroImage
+  ViroImage,
+  ViroGeometry,
+  ViroMaterials
 } from 'react-viro';
 
 
-ViroARTrackingTargets.createTargets({
-    "drone" : {
-      source : require('../assets/objects/drone.arobject'),
-      type : 'Object',
-    },
-  });
+
+
 
 export default class HelloWorldSceneAR extends Component {
 
@@ -40,16 +38,21 @@ export default class HelloWorldSceneAR extends Component {
   
 
   render() {
+    const materials = ViroMaterials.createMaterials({
+      redMaterial: {
+        diffuseColor: 'red'
+      }
+    });
     return (
       <ViroARScene onTrackingUpdated={this._onInitialized} >
-        <ViroARObjectMarker target={"drone"} >
-          <ViroImage
-            height={2}
-            width={2}
-            scale={[.1, .1, .1]}
-            position={[0, .25, 0]}
-            source={require("../assets/logo.png")}/>
-        </ViroARObjectMarker>
+        <ViroGeometry 
+          position={[-2.5, 0, -0.1]} 
+          scale={[1.0, 1.0, 1.0]}
+          materials="redMaterial"
+          vertices={[ [1, 0, 0], [0, 1, 0], [-1, 0, 0] ]}
+          normals={[ [0, 0, 1], [0, 0, 1], [0, 0, 1] ]}
+          texcoords={[ [1, 0], [0, 1], [-1, 0] ]}
+          triangleIndices={[ [0, 1, 2 ] ]} />
       </ViroARScene>
     );
   }
