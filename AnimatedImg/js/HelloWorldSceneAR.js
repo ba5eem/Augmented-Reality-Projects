@@ -13,7 +13,8 @@ import {
   ViroBox,
   ViroImage,
   ViroGeometry,
-  ViroMaterials
+  ViroMaterials,
+  ViroAnimatedImage
 } from 'react-viro';
 
 
@@ -41,15 +42,19 @@ export default class HelloWorldSceneAR extends Component {
 
     return (
       <ViroARScene onTrackingUpdated={this._onInitialized} >
-        <ViroText fontSize={48}
-          style={styles.boldFont} 
-          position={[0, 0, -8]}
-          rotation={[-20,45,0]}
-          width={20} 
-          height={5} 
-          extrusionDepth={8}
-          materials={["frontMaterial", "backMaterial", "sideMaterial"]}
-          text="ARL" />
+        <ViroAnimatedImage
+          height={2}
+          width={2}
+          position={[0,0,-8]}
+          source={{uri:"https://i.imgur.com/QGo5isT.gif"}}
+       />
+
+       <ViroAnimatedImage
+          height={2}
+          width={4}
+          position={[0,3,-8]}
+          source={{uri: "http://bestanimations.com/Flags/USA/usa-american-flag-waving-animated-gif-29.gif"}}/>
+          
       </ViroARScene>
     );
   }
