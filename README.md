@@ -21,7 +21,12 @@ AR Apps Repo - Each branch represent a different demo/feature - check readme for
  - All you need for setup is your own API Key from ViroMedia
 
 ### Branch [Animated Image](https://docs.viromedia.com/docs/viroanimatedimage)
- - Introduction extrusionDepth with ViroReact
  - Simple example of gif in AR
  - Two gifs at once - feel free to change uri
+ - All you need for setup is your own API Key from ViroMedia
+
+### Branch [Plan Anchoring](https://docs.viromedia.com/docs/viroarplaneselector)
+ - Plane detected
+ - Object appears in space
+ - Working on placing object on Place detected
  - All you need for setup is your own API Key from ViroMedia
