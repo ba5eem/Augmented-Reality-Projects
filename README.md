@@ -19,3 +19,9 @@ AR Apps Repo - Each branch represent a different demo/feature - check readme for
  - Introduction extrusionDepth with ViroReact
  - Simple example of rendering 3D text
  - All you need for setup is your own API Key from ViroMedia
+
+### Branch [Animated Image](https://docs.viromedia.com/docs/viroanimatedimage)
+ - Introduction extrusionDepth with ViroReact
+ - Simple example of gif in AR
+ - Two gifs at once - feel free to change uri
+ - All you need for setup is your own API Key from ViroMedia
