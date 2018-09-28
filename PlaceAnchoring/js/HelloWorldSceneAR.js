@@ -14,11 +14,12 @@ import {
   ViroImage,
   ViroGeometry,
   ViroMaterials,
-  ViroAnimatedImage
+  ViroAnimatedImage,
+  ViroARPlane
 } from 'react-viro';
 
 
-
+console.disableYellowBox=true;
 
 
 export default class HelloWorldSceneAR extends Component {
@@ -39,22 +40,23 @@ export default class HelloWorldSceneAR extends Component {
   
 
   render() {
+    // the box only appears in the space when a plane is detected, with minwidth and height at 0.05 - pretty much any surface counts - i couldnt get the box to only show up on that specific surface. working on that later.
 
     return (
       <ViroARScene onTrackingUpdated={this._onInitialized} >
-        <ViroAnimatedImage
-          height={2}
-          width={2}
-          position={[0,0,-8]}
-          source={{uri:"https://i.imgur.com/QGo5isT.gif"}}
-       />
+        <ViroARPlane 
+          onAnchorFound={()=>console.log('found')}
+          minHeight={.05} 
+          minWidth={.05} 
+          alignment={"Horizontal"}>
+            <ViroBox
+              height={0.5}
+              length={0.5}
+              width={0.5}
+              position={[0,0,-3]}
+              materials="frontMaterial" />
 
-       <ViroAnimatedImage
-          height={2}
-          width={4}
-          position={[0,3,-8]}
-          source={{uri: "http://bestanimations.com/Flags/USA/usa-american-flag-waving-animated-gif-29.gif"}}/>
-          
+        </ViroARPlane>    
       </ViroARScene>
     );
   }
@@ -84,7 +86,7 @@ var styles = StyleSheet.create({
 
 ViroMaterials.createMaterials({
     frontMaterial: {
-      diffuseColor: '#FFFFFF',
+      diffuseColor: 'red',
     },
     backMaterial: {
       diffuseColor: '#FF0000',
