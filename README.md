@@ -14,3 +14,8 @@ AR Apps Repo - Each branch represent a different demo/feature - check readme for
 
 ### Branch [custom geometry](https://docs.viromedia.com/v2.11.0/docs/virogeometry)
  - Working on this as you read this...unsolved
+
+### Branch [3D Text](https://docs.viromedia.com/v2.11.0/docs/virotext2#section-3d-text)
+ - Introduction extrusionDepth with ViroReact
+ - Simple example of rendering 3D text
+ - All you need for setup is your own API Key from ViroMedia
