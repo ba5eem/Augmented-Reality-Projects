@@ -30,3 +30,24 @@ AR Apps Repo - Each branch represent a different demo/feature - check readme for
  - Object appears in space
  - Working on placing object on Place detected
  - All you need for setup is your own API Key from ViroMedia
+
+### The Math - [Geo Positioned AR](https://github.com/viromedia/viro/issues/131)
+
+```js
+const _latLongToMerc=(lat_deg, lon_deg) => {
+   let lon_rad = (lon_deg / 180.0 * Math.PI)
+   let lat_rad = (lat_deg / 180.0 * Math.PI)
+   let sm_a = 6378137.0 // Earth Radius
+   let xmeters  = sm_a * lon_rad;
+   let ymeters = sm_a * Math.log((Math.sin(lat_rad) + 1) / Math.cos(lat_rad))
+   return ({x:xmeters, y:ymeters});
+
+}
+
+const transformPointToAR = (lat, long, deviceLatitude, deviceLongitude) => {
+  let objPoint = _latLongToMerc(lat, long);
+  let devicePoint = _latLongToMerc(deviceLatitude, deviceLongitude);
+  let objFinalPosZ = objPoint.y - devicePoint.y;
+  let objFinalPosX = objPoint.x - devicePoint.x;
+  return ({x:objFinalPosX, z:-objFinalPosZ});
+}```
