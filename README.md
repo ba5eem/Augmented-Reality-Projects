@@ -31,7 +31,7 @@ AR Apps Repo - Each branch represent a different demo/feature - check readme for
  - Working on placing object on Place detected
  - All you need for setup is your own API Key from ViroMedia
 
-### The Math - [Geo Positioned AR](https://github.com/viromedia/viro/issues/131)
+### The Math - [Location Based AR](https://github.com/viromedia/viro/issues/131)
 
 ```js
 const _latLongToMerc=(lat_deg, lon_deg) => {
