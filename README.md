@@ -41,7 +41,6 @@ const _latLongToMerc=(lat_deg, lon_deg) => {
    let xmeters  = sm_a * lon_rad;
    let ymeters = sm_a * Math.log((Math.sin(lat_rad) + 1) / Math.cos(lat_rad))
    return ({x:xmeters, y:ymeters});
-
 }
 
 const transformPointToAR = (lat, long, deviceLatitude, deviceLongitude) => {
