@@ -3,8 +3,10 @@ import { AR, Asset } from 'expo';
 import ExpoTHREE, { AR as ThreeAR, THREE } from 'expo-three';
 import { View as GraphicsView } from 'expo-graphics';
 import { NativeModules } from 'react-native';
+import * as lib from './libs';
 
 import * as ARUtils from './ar-utils';
+const _ = require('lodash');
 
 
 const { ExponentAR } = NativeModules;
@@ -55,15 +57,29 @@ class MainScreen extends React.Component {
 
   async componentWillMount() {
     AR.onFrameDidUpdate(() => {
-      if (!this.arSession) {
-        return;
-      }
-      const { lightEstimation, rawFeaturePoints, anchors } = AR.getCurrentFrame({
+
+      const { lightEstimation, rawFeaturePoints, capturedDepthData, anchors } = AR.getCurrentFrame({
         lightEstimation: true,
         rawFeaturePoints: true,
-        // capturedDepthData: true,
+        capturedDepthData: true,
         anchors: {},
       });
+      if(!_.isEmpty(rawFeaturePoints)) {
+          console.log('rawFeaturePoints: ', rawFeaturePoints);
+        }
+
+      if(!_.isEmpty(lightEstimation)) {
+          //console.log('lightEstimation: ', lightEstimation);
+        }
+
+      if(!_.isEmpty(capturedDepthData)) {
+          console.log('capturedDepthData: ', capturedDepthData);
+        }
+
+      if(!_.isEmpty(anchors)) {
+          console.log('anchors: ', anchors);
+        }
+
 
       if (lightEstimation && this.light) {
         // const {
@@ -171,6 +187,8 @@ class MainScreen extends React.Component {
     // This will allow ARKit to collect Horizontal surfaces
     AR.setWorldAlignment(AR.WorldAlignmentTypes.Gravity);
     AR.setPlaneDetection(AR.PlaneDetectionTypes.Horizontal);
+
+    lib.HitTestResultTypes('VerticalPlane');
 
     console.log('Version: ', AR.getVersion());
     console.log('ARFaceTrackingConfiguration: ', ExponentAR.ARFaceTrackingConfiguration);
