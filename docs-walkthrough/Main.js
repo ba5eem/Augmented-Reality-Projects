@@ -2,8 +2,13 @@ import React from 'react';
 import { AR, Asset } from 'expo';
 import ExpoTHREE, { AR as ThreeAR, THREE } from 'expo-three';
 import { View as GraphicsView } from 'expo-graphics';
+import * as lib from './libs';
 
-const _ = require('lodash');
+
+// review all lib function on libs.js file
+// I moved into seperate file so it wasnt so crammed here
+// Each function has link to docs for further analysis
+
 
 
 
@@ -25,14 +30,13 @@ class MainScreen extends React.Component {
     THREE.suppressExpoWarnings(true)
     ThreeAR.suppressWarnings()
 
-    let isARvailable = await AR.isAvailable(); //  true
-    let getVersion = await AR.getVersion(); // 1.5
+    let isARvailable = await AR.isAvailable(); //  https://docs.expo.io/versions/v31.0.0/sdk/AR#isavailable
+    let getVersion = await AR.getVersion(); // https://docs.expo.io/versions/v31.0.0/sdk/AR#getversion
 
-    const listener = AR.onFrameDidUpdate((data) => {
-      if(!_.isEmpty(data)) {
-        console.log('FrameDidUpdate: ', data);
-      }
-    });
+    lib.onFrameDidUpdate(); // libs.js line: 6
+    lib.onCameraDidChangeTrackingState(); // libs.js line: 19
+
+
 
   }
 
@@ -58,6 +62,8 @@ class MainScreen extends React.Component {
   onContextCreate = async ({ gl, scale: pixelRatio, width, height }) => {
     // This will allow ARKit to collect Horizontal surfaces
     AR.setPlaneDetection(AR.PlaneDetectionTypes.Horizontal);
+
+    lib.HitTestResultTypes('VerticalPlane'); // libs.js line: 35
 
     // Create a 3D renderer
     this.renderer = new ExpoTHREE.Renderer({
@@ -101,6 +107,7 @@ class MainScreen extends React.Component {
 
   // When the phone rotates, or the view changes size, this method will be called.
   onResize = ({ x, y, scale, width, height }) => {
+
     // Let's stop the function if we haven't setup our scene yet
     if (!this.renderer) {
       return;
