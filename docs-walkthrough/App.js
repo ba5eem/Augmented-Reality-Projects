@@ -3,7 +3,7 @@ global.self = global;
 import { THREE } from 'expo-three';
 import React from 'react';
 import { ScreenOrientation } from 'expo';
-import ImageScreen from './Image.js';
+import MainScreen from './Main.js';
 
 console.ignoredYellowBox = ['Module', 'Class'];
 
@@ -15,6 +15,6 @@ export default class App extends React.Component {
   }
 
   render() {
-    return <ImageScreen />;
+    return <MainScreen />;
   }
 }
