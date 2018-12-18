@@ -21,8 +21,9 @@ export const onCameraDidChangeTrackingState = () => {
 	AR.onCameraDidChangeTrackingState( ({ trackingState: TrackingState, trackingStateReason: TrackingStateReason }) => {
 		// outputs tips / reasons why things may not be tracking
 		// can use to set state to help user understand why it may not be working
-	  console.log('TrackingState: ',TrackingState); 
-	  console.log('TrackingStateReason', TrackingStateReason);
+
+	  //console.log('TrackingState: ',TrackingState); 
+	  //console.log('TrackingStateReason', TrackingStateReason);
 
 	  return { 
 	  	trackingState: TrackingState, 

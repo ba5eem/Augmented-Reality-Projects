@@ -3,15 +3,20 @@ import { AR, Asset } from 'expo';
 import ExpoTHREE, { AR as ThreeAR, THREE } from 'expo-three';
 import { View as GraphicsView } from 'expo-graphics';
 import * as lib from './libs';
+import {AR as ArrayMethods} from './AR-Object-Methods';
+import { clear } from './ClearScreen.js';
+clear();
+
+const cyan = (arg) => {
+    let bgCyan = '\x1b[46m%s\x1b[0m';
+    console.log(bgCyan,bgCyan,bgCyan,bgCyan,bgCyan,arg);
+};
+cyan(ArrayMethods.length);
 
 
 // review all lib function on libs.js file
 // I moved into seperate file so it wasnt so crammed here
 // Each function has link to docs for further analysis
-
-
-
-
 
 class MainScreen extends React.Component {
   constructor(props){
@@ -28,7 +33,7 @@ class MainScreen extends React.Component {
 
   async componentDidMount() {
     THREE.suppressExpoWarnings(true)
-    ThreeAR.suppressWarnings()
+
 
     let isARvailable = await AR.isAvailable(); //  https://docs.expo.io/versions/v31.0.0/sdk/AR#isavailable
     let getVersion = await AR.getVersion(); // https://docs.expo.io/versions/v31.0.0/sdk/AR#getversion
