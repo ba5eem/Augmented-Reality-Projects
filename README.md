@@ -1,7 +1,10 @@
 # Augmented Reality
 AR Apps Repo - Each branch represent a different demo/feature - check readme for setup guide
 
-### Branch [objectDetection](https://docs.viromedia.com/docs/viroimage)
+[Expo](https://docs.expo.io/versions/v28.0.0/sdk/AR)
+[ViroReact](https://docs.viromedia.com/)
+
+### Branch [objectDetection](https://docs.viromedia.com/docs/viroimage) - ViroReact
  - Download [Scanning App](https://developer.apple.com/documentation/arkit/scanning_and_detecting_3d_objects)
  - Open in xcode
  - Run on iOS device
@@ -12,20 +15,30 @@ AR Apps Repo - Each branch represent a different demo/feature - check readme for
  - Run app
  - Allow phone to focus on object, ensure you have a good amount of light
 
-### Branch [custom geometry](https://docs.viromedia.com/v2.11.0/docs/virogeometry)
+### Branch [imageDetection](https://docs.expo.io/versions/v28.0.0/sdk/AR#detection-images) - Expo
+ - git clone repo
+ - git checkout imageDetection
+ - npm i
+ - Uou will beed to download a test image into the folder to use
+ - It will recognize the image opening on a computer screen
+ - expo start
+ - Scan QR code to open in Expo testbed app
+ - Hold camera over image
+
+### Branch [custom geometry](https://docs.viromedia.com/v2.11.0/docs/virogeometry) - ViroReact
  - Working on this as you read this...unsolved
 
-### Branch [3D Text](https://docs.viromedia.com/v2.11.0/docs/virotext2#section-3d-text)
+### Branch [3D Text](https://docs.viromedia.com/v2.11.0/docs/virotext2#section-3d-text) - ViroReact
  - Introduction extrusionDepth with ViroReact
  - Simple example of rendering 3D text
  - All you need for setup is your own API Key from ViroMedia
 
-### Branch [Animated Image](https://docs.viromedia.com/docs/viroanimatedimage)
+### Branch [Animated Image](https://docs.viromedia.com/docs/viroanimatedimage) - ViroReact
  - Simple example of gif in AR
  - Two gifs at once - feel free to change uri
  - All you need for setup is your own API Key from ViroMedia
 
-### Branch [Plane Anchoring](https://docs.viromedia.com/docs/viroarplaneselector)
+### Branch [Plane Anchoring](https://docs.viromedia.com/docs/viroarplaneselector) - ViroReact
  - Plane detected
  - Object appears in space
  - Working on placing object on Place detected
