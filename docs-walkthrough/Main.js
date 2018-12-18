@@ -2,53 +2,154 @@ import React from 'react';
 import { AR, Asset } from 'expo';
 import ExpoTHREE, { AR as ThreeAR, THREE } from 'expo-three';
 import { View as GraphicsView } from 'expo-graphics';
-import * as lib from './libs';
-import {AR as ArrayMethods} from './AR-Object-Methods';
-import { clear } from './ClearScreen.js';
-clear();
+import { NativeModules } from 'react-native';
 
-const cyan = (arg) => {
-    let bgCyan = '\x1b[46m%s\x1b[0m';
-    console.log(bgCyan,bgCyan,bgCyan,bgCyan,bgCyan,arg);
-};
-cyan(ArrayMethods.length);
+import * as ARUtils from './ar-utils';
 
 
-// review all lib function on libs.js file
-// I moved into seperate file so it wasnt so crammed here
-// Each function has link to docs for further analysis
-// Detection Image please look at Branch: imageDetection for example
+const { ExponentAR } = NativeModules;
 
 class MainScreen extends React.Component {
-  constructor(props){
-    super(props);
-
-    this.state = {
-      docs: true
+  handleAnchor = (anchor, eventType) => {
+    if (eventType === AR.AnchorEventTypes.Add) {
+      // Something added!
+    } else if (eventType === AR.AnchorEventTypes.Remove) {
+      // Now it's changed
+    } else if (eventType === AR.AnchorEventTypes.Update) {
+      // Now it's gone...
     }
+  };
+
+  handlePlane = (anchor, eventType) => {
+    if (eventType === AR.AnchorEventTypes.Add) {
+      // Something added!
+    } else if (eventType === AR.AnchorEventTypes.Remove) {
+      // Now it's changed
+    } else if (eventType === AR.AnchorEventTypes.Update) {
+      // Now it's gone...
+    }
+  };
+
+  // When the provided image is found in real life, it'll be shown here.
+  handleImage = (anchor, eventType) => {
+    const { identifier, image, transform } = anchor;
+    console.log('Do something with discovered image');
+    if (eventType === AR.AnchorEventTypes.Add) {
+      // Something added!
+    } else if (eventType === AR.AnchorEventTypes.Remove) {
+      // Now it's changed
+    } else if (eventType === AR.AnchorEventTypes.Update) {
+      // Now it's gone...
+    }
+  };
+
+  handleFace = (anchor, eventType) => {
+    if (eventType === AR.AnchorEventTypes.Add) {
+      // Something added!
+    } else if (eventType === AR.AnchorEventTypes.Remove) {
+      // Now it's changed
+    } else if (eventType === AR.AnchorEventTypes.Update) {
+      // Now it's gone...
+    }
+  };
+
+  async componentWillMount() {
+    AR.onFrameDidUpdate(() => {
+      if (!this.arSession) {
+        return;
+      }
+      const { lightEstimation, rawFeaturePoints, anchors } = AR.getCurrentFrame({
+        lightEstimation: true,
+        rawFeaturePoints: true,
+        // capturedDepthData: true,
+        anchors: {},
+      });
+
+      if (lightEstimation && this.light) {
+        // const {
+        //   ambientIntensity,
+        //   ambientColorTemperature,
+        //   // These will only be returned with front facing AR
+        //   primaryLightDirection,
+        //   primaryLightIntensity,
+        // } = lightEstimation;
+
+        this.light.data = lightEstimation;
+      }
+      // This is the depth info from the iPhoneX front camera
+      // if (capturedDepthData) {
+      //   const {
+      //     depthDataQuality,
+      //     depthDataAccuracy,
+      //     depthDataFiltered,
+      //     cameraCalibrationData,
+      //   } = capturedDepthData;
+
+      //   const {
+      //     intrinsicMatrix,
+      //     intrinsicMatrixReferenceDimensions, // {width, height}
+      //     extrinsicMatrix,
+      //     pixelSize,
+      //     lensDistortionLookupTable,
+      //     inverseLensDistortionLookupTable,
+      //     lensDistortionCenter, // {x, y}
+      //   } = cameraCalibrationData;
+      // }
+
+      if (Array.isArray(anchors) && this.planes) {
+        const planes = anchors.filter(({ type }) => type === 'ARPlaneAnchor');
+        this.planes.data = planes;
+      }
+
+      // Really not much to do with raw feature points, so here's this pretty dot visualizer...
+      if (this.points) {
+        this.points.data = rawFeaturePoints;
+      }
+      // console.log('A: isLightEstimationEnabled', AR.getAutoFocusEnabled());
+      // AR.getAutoFocusEnabled(false);
+    });
+
+    AR.onDidFailWithError(({ error }) => {
+      console.error(error);
+    });
+
+    AR.onAnchorsDidUpdate(({ anchors, eventType }) => {
+      // console.log('anchors did update');
+      for (let anchor of anchors) {
+        // console.log('handle anchor:', anchor.type);
+        switch (anchor.type) {
+          case AR.AnchorTypes.Anchor:
+            this.handleAnchor(anchor, eventType);
+            break;
+          case AR.AnchorTypes.Plane:
+            this.handlePlane(anchor, eventType);
+            break;
+          case AR.AnchorTypes.Face:
+            this.handleFace(anchor, eventType);
+            break;
+          case AR.AnchorTypes.Image:
+            this.handleImage(anchor, eventType);
+            break;
+          default:
+            break;
+        }
+      }
+    });
+
+    AR.onCameraDidChangeTrackingState(({ trackingState, trackingStateReason }) => {});
+
+    AR.onSessionWasInterrupted(() => {
+      console.log('Backgrounded App: Session was interrupted');
+    });
+
+    AR.onSessionInterruptionEnded(() => {
+      console.log('Foregrounded App: Session is no longer interrupted');
+    });
   }
 
-
-
-
-
-  async componentDidMount() {
-    THREE.suppressExpoWarnings(true)
-
-
-    let isARvailable = await AR.isAvailable(); //  https://docs.expo.io/versions/v31.0.0/sdk/AR#isavailable
-    let getVersion = await AR.getVersion(); // https://docs.expo.io/versions/v31.0.0/sdk/AR#getversion
-
-    lib.onFrameDidUpdate(); // libs.js line: 6
-    lib.onCameraDidChangeTrackingState(); // libs.js line: 19
-
-
-
-  }
-
-
-  
   render() {
+    const world = AR.TrackingConfigurations.World;
+    const face = AR.TrackingConfigurations.Face;
 
     return (
       <GraphicsView
@@ -56,20 +157,82 @@ class MainScreen extends React.Component {
         onContextCreate={this.onContextCreate}
         onRender={this.onRender}
         onResize={this.onResize}
+        arTrackingConfiguration={world}
         isArEnabled
         isArRunningStateEnabled
         isArCameraStateEnabled
-        arTrackingConfiguration={AR.TrackingConfigurations.World}
       />
     );
   }
 
-  // When our context is built we can start coding 3D things.
+
+    // When our context is built we can start coding 3D things.
   onContextCreate = async ({ gl, scale: pixelRatio, width, height }) => {
     // This will allow ARKit to collect Horizontal surfaces
+    AR.setWorldAlignment(AR.WorldAlignmentTypes.Gravity);
     AR.setPlaneDetection(AR.PlaneDetectionTypes.Horizontal);
 
-    lib.HitTestResultTypes('VerticalPlane'); // libs.js line: 35
+    console.log('Version: ', AR.getVersion());
+    console.log('ARFaceTrackingConfiguration: ', ExponentAR.ARFaceTrackingConfiguration);
+    console.log(
+      'AROrientationTrackingConfiguration: ',
+      ExponentAR.AROrientationTrackingConfiguration
+    );
+    console.log('ARWorldTrackingConfiguration: ', ExponentAR.ARWorldTrackingConfiguration);
+
+    if (AR.getVersion() === '1.5') {
+      AR.setAutoFocusEnabled(true);
+      console.log('A: is Auto Focus Enabled', AR.getAutoFocusEnabled());
+      AR.setAutoFocusEnabled(false);
+      console.log('B: is Auto Focus Enabled', AR.getAutoFocusEnabled());
+
+      AR.setLightEstimationEnabled(true);
+      console.log('A: isLightEstimationEnabled', AR.getLightEstimationEnabled());
+      AR.setLightEstimationEnabled(false);
+      console.log('B: isLightEstimationEnabled', AR.getLightEstimationEnabled());
+
+      console.log('FaceTrackingVideoFormats:', ExponentAR.FaceTrackingVideoFormats);
+      console.log('WorldTrackingVideoFormats:', ExponentAR.WorldTrackingVideoFormats);
+      console.log('OrientationTrackingVideoFormats:', ExponentAR.OrientationTrackingVideoFormats);
+
+      AR.setProvidesAudioData(true);
+      console.log('A: Provides Audio Data', AR.getProvidesAudioData());
+      AR.setProvidesAudioData(false);
+      console.log('B: Provides Audio Data', AR.getProvidesAudioData());
+
+      Object.keys(AR.PlaneDetectionTypes).forEach(key => {
+        const planeDetectionType = AR.PlaneDetectionTypes[key];
+        AR.setPlaneDetection(planeDetectionType);
+        console.log('Plane Detection: ', key, planeDetectionType, AR.getPlaneDetection());
+      });
+
+      Object.keys(AR.WorldAlignmentTypes).forEach(key => {
+        const worldAlignmentType = AR.WorldAlignmentTypes[key];
+        AR.setWorldAlignment(worldAlignmentType);
+        console.log('World Alignment: ', key, AR.getWorldAlignment());
+      });
+
+      console.log('isFrontCameraAvailable:', AR.isFrontCameraAvailable());
+      console.log('isRearCameraAvailable:', AR.isRearCameraAvailable());
+
+      Object.keys(AR.TrackingConfigurations).forEach(key => {
+        const trackingConfiguration = AR.TrackingConfigurations[key];
+        // AR.setConfigurationAsync(trackingConfiguration);
+        console.log(
+          'isConfigurationAvailable:',
+          key,
+          AR.isConfigurationAvailable(trackingConfiguration)
+        );
+      });
+    }
+
+
+
+
+
+
+
+
 
     // Create a 3D renderer
     this.renderer = new ExpoTHREE.Renderer({
@@ -109,29 +272,59 @@ class MainScreen extends React.Component {
     this.points = new ThreeAR.Points();
     // Add the points to our scene...
     this.scene.add(this.points)
+
+    this.setupARUtils();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   };
 
-  // When the phone rotates, or the view changes size, this method will be called.
+
+
+
+
+
+
+
+
+
+  setupARUtils = () => {
+    this.points = new ARUtils.Points();
+    this.scene.add(this.points);
+    this.light = new ARUtils.Light(0x222222);
+    this.scene.add(this.light);
+    this.planes = new ARUtils.Planes();
+    this.scene.add(this.planes);
+  };
+
   onResize = ({ x, y, scale, width, height }) => {
 
-    // Let's stop the function if we haven't setup our scene yet
     if (!this.renderer) {
       return;
     }
+
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
     this.renderer.setPixelRatio(scale);
     this.renderer.setSize(width, height);
   };
 
-  // Called every frame.
-  onRender = () => {
-    // This will make the points get more rawDataPoints from Expo.AR
+  onRender = delta => {
+
     this.points.update()
-    // Finally render the scene with the AR Camera
+
     this.renderer.render(this.scene, this.camera);
   };
 }
-
-
 export default MainScreen;
