@@ -60,11 +60,13 @@ class ImageScreen extends React.Component {
     // Combine our geometry and material
     this.cube = new THREE.Mesh(geometry, material);
 
-
-    let distance = -30;
+    // Here is sample code of how updating the z index can update the AR cube
+    // Real world example would use user location
+    // as they walk towards the marker the distance decreases, and the z index will update
+    let distance = -30; // marker location
     setInterval(() => {
       distance++
-      this.cube.position.z = distance;
+      this.cube.position.z = distance; // determined using locationAr func using observer & markers coords
       this.scene.add(this.cube);
     },500)
 
