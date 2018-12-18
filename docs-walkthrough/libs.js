@@ -42,6 +42,3 @@ export const HitTestResultTypes = ( type ) => {
 
 
 
-
-AR.HitTestResultTypes.VerticalPlane;
-

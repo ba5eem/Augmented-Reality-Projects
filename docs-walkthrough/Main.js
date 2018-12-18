@@ -17,6 +17,7 @@ cyan(ArrayMethods.length);
 // review all lib function on libs.js file
 // I moved into seperate file so it wasnt so crammed here
 // Each function has link to docs for further analysis
+// Detection Image please look at Branch: imageDetection for example
 
 class MainScreen extends React.Component {
   constructor(props){
