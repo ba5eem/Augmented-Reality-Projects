@@ -40,5 +40,35 @@ export const HitTestResultTypes = ( type ) => {
 	AR.HitTestResultTypes.hitType;
 }
 
+export const getCurrentFrame = () => {
+	AR.onFrameDidUpdate(() => {
 
+      const { lightEstimation, rawFeaturePoints, capturedDepthData, anchors } = AR.getCurrentFrame({
+        lightEstimation: true,
+        rawFeaturePoints: true,
+        capturedDepthData: true,
+        anchors: {},
+      });
+      if(!_.isEmpty(rawFeaturePoints)) {
+          //console.log('rawFeaturePoints: ', rawFeaturePoints);
+           return true;
+        }
 
+      if(!_.isEmpty(lightEstimation)) {
+          //console.log('lightEstimation: ', lightEstimation);
+           return true;
+        }
+
+      if(!_.isEmpty(capturedDepthData)) {
+          console.log('capturedDepthData: ', capturedDepthData);
+           return true;
+        }
+
+      if(!_.isEmpty(anchors)) {
+          //console.log('anchors: ', anchors);
+           return true;
+        }
+    });
+  return false;
+
+}

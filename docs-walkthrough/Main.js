@@ -5,6 +5,7 @@ import { View as GraphicsView } from 'expo-graphics';
 import * as lib from './libs';
 import {AR as ArrayMethods} from './AR-Object-Methods';
 import { clear } from './ClearScreen.js';
+const _ = require('lodash');
 clear();
 
 const cyan = (arg) => {
@@ -44,6 +45,11 @@ class MainScreen extends React.Component {
 
 
 
+
+  }
+
+  async componentWillMount(){
+    console.log(lib.getCurrentFrame());
   }
 
 
