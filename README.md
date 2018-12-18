@@ -19,11 +19,21 @@ AR Apps Repo - Each branch represent a different demo/feature - check readme for
  - git clone repo
  - git checkout imageDetection
  - npm i
- - Uou will beed to download a test image into the folder to use
+ - You will beed to download a test image into the folder to use
  - It will recognize the image opening on a computer screen
  - expo start
  - Scan QR code to open in Expo testbed app
  - Hold camera over image
+
+### Branch [simulatedDistance](https://docs.expo.io/versions/v28.0.0/sdk/AR) - Expo
+ - git clone repo
+ - git checkout imageDetection
+ - npm i
+ - You will beed to download a test image into the folder to use
+ - It will recognize the image opening on a computer screen
+ - expo start
+ - Scan QR code to open in Expo testbed app
+ - Watch marker get closer and eventually go past you
 
 ### Branch [custom geometry](https://docs.viromedia.com/v2.11.0/docs/virogeometry) - ViroReact
  - Working on this as you read this...unsolved
