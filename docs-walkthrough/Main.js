@@ -26,7 +26,7 @@ class MainScreen extends React.Component {
     ThreeAR.suppressWarnings()
 
     let isARvailable = await AR.isAvailable(); //  true
-    let getVersion = await AR.getVersion(); // 1.5
+    //let getVersion = await AR.getVersion(); // 1.5
 
     const listener = AR.onFrameDidUpdate((data) => {
       if(!_.isEmpty(data)) {
