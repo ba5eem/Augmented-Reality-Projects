@@ -9,6 +9,7 @@
     "eject": "expo eject"
   },
   "dependencies": {
+    "color-temperature": "^0.2.7",
     "expo": "^29.0.0",
     "expo-graphics": "1.0.0-alpha.5",
     "expo-three": "3.0.0-alpha.4",
