@@ -18,27 +18,27 @@ export default class MainScreen extends React.Component {
       data: true
     }
   }
-  touch = new THREE.Vector2();
+  touch = new THREE.Vector3();
   raycaster = new THREE.Raycaster();
 
   updateTouch = ({ x, y }) => {
 
-    this.touch.x = x / 375 * 2 - 1;
-    this.touch.y = -(y / 812) * 2 + 1;
+    this.touch.x = x*0.1;
+    this.touch.y = y*0.1;
+    console.log(this.touch);
+
+
+    console.log(x,y);
+
+    this.sphere.position.set(this.touch.x, this.touch.y, -10);
     this.runHitTest();
   };
 
   runHitTest = () => {
     this.raycaster.setFromCamera(this.touch, this.camera);
     const intersects = this.raycaster.intersectObjects(this.planes.children);
-    console.log(this.touch);
-    this.sphere.position.set(this.touch.x, this.touch.y+2, -10);
-    for (const intersect of intersects) {
-      const { distance, face, faceIndex, object, point, uv } = intersect;
-      console.log(point)
-      this.sphere.position.set(point.x, point.y, point.z);
-      this.sphere.visible = true;
-    }
+
+    
   };
 
   componentWillMount() {
@@ -112,6 +112,8 @@ export default class MainScreen extends React.Component {
     this.scene.add(sphere);
     this.sphere = sphere;
     this.sphere.position.z = -10;
+    this.sphere.position.x = 3;
+    console.log(this.sphere.position);
   };
 
   setupARUtils = () => {
