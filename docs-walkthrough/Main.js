@@ -55,9 +55,12 @@ class MainScreen extends React.Component {
     lib.onCameraDidChangeTrackingState(); // libs.js line: 19
     lib.getCurrentFrame() // libs.js line 43
 
-
-    
-
+    AR.onDidFailWithError(({ err }) => { console.log(err) });
+    // https://docs.expo.io/versions/v31.0.0/sdk/AR#ondidfailwitherror--error----
+    AR.onSessionWasInterrupted(() => { console.log("interrupted") });
+    // https://docs.expo.io/versions/v31.0.0/sdk/AR#onsessionwasinterrupted----
+    AR.onSessionInterruptionEnded(() => { console.log('interruption over') });
+    // https://docs.expo.io/versions/v31.0.0/sdk/AR#onsessioninterruptionended----
 
   }
 
@@ -117,6 +120,12 @@ class MainScreen extends React.Component {
     this.points = new ThreeAR.Points();
     // Add the points to our scene...
     this.scene.add(this.points)
+
+
+
+
+
+
   };
 
   // When the phone rotates, or the view changes size, this method will be called.
