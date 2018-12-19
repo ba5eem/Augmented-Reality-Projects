@@ -87,7 +87,39 @@ class MainScreen extends React.Component {
   // When our context is built we can start coding 3D things.
   onContextCreate = async ({ gl, scale: pixelRatio, width, height }) => {
     // This will allow ARKit to collect Horizontal surfaces
+
     AR.setPlaneDetection(AR.PlaneDetectionTypes.Horizontal);
+
+    // https://docs.expo.io/versions/v31.0.0/sdk/AR#plane-detection
+    // not quite what i was hoping for - but very easy to setup.
+
+    AR.onAnchorsDidUpdate(({ anchors, eventType }) => {
+      console.log('anchors did update');
+      for (let anchor of anchors) {
+        console.log('handle anchor:', anchor.type);
+        switch (anchor.type) {
+          case AR.AnchorTypes.Anchor:
+            console.log('anchor');
+            break;
+          case AR.AnchorTypes.Plane:
+            console.log('plane detected');
+            break;
+          case AR.AnchorTypes.Face:
+            console.log('face');
+            break;
+          case AR.AnchorTypes.Image:
+            console.log('image');
+            break;
+          default:
+            break;
+        }
+      }
+    });
+
+
+
+
+
 
     lib.HitTestResultTypes('VerticalPlane'); // libs.js line: 35
     lib.getPlaneAnchor(); // check commit history for example: ARPlaneAnchor - libs.js line: 54
