@@ -25,12 +25,13 @@ class MainScreen extends React.Component {
     super(props);
 
     this.state = {
-      docs: true
+      docs: false
     }
   }
 
 
 
+  
 
 
   async componentDidMount() {
@@ -42,15 +43,15 @@ class MainScreen extends React.Component {
 
     lib.onFrameDidUpdate(); // libs.js line: 6
     lib.onCameraDidChangeTrackingState(); // libs.js line: 19
+    lib.getCurrentFrame() // libs.js line 43
 
 
+    
 
 
   }
 
-  async componentWillMount(){
-    console.log(lib.getCurrentFrame());
-  }
+
 
 
   
@@ -105,7 +106,50 @@ class MainScreen extends React.Component {
     // Place the box 0.4 meters in front of us.
     this.cube.position.z = -10
     // Add the cube to the scene
-    this.scene.add(this.cube);
+
+
+    handlePlane = (anchor, eventType) => {
+      console.log(anchor)
+      console.log('eventType: ', eventType);
+      if (eventType === AR.AnchorEventTypes.Add) {
+        // Something added!
+        console.log('oallala')
+        this.setState({
+          data: true
+        })
+      } else if (eventType === AR.AnchorEventTypes.Remove) {
+        // Now it's changed
+      } else if (eventType === AR.AnchorEventTypes.Update) {
+        // Now it's gone...
+        console.log('update')
+        this.scene.add(this.cube);
+        
+      }
+    };
+
+
+    AR.onAnchorsDidUpdate(({ anchors, eventType }) => {
+      console.log('anchors did update');
+      for (let anchor of anchors) {
+        console.log('handle anchor:', anchor.type);
+        switch (anchor.type) {
+          case AR.AnchorTypes.Anchor:
+            console.log('anchor');
+            break;
+          case AR.AnchorTypes.Plane:
+            handlePlane(anchor, eventType);
+            break;
+          case AR.AnchorTypes.Face:
+            console.log('face');
+            break;
+          case AR.AnchorTypes.Image:
+            console.log('image');
+            break;
+          default:
+            break;
+        }
+      }
+    });
     
     // Setup a light so we can see the cube color
     // AmbientLight colors all things in the scene equally.

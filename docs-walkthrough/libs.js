@@ -41,34 +41,54 @@ export const HitTestResultTypes = ( type ) => {
 }
 
 export const getCurrentFrame = () => {
+	// https://docs.expo.io/versions/v31.0.0/sdk/AR#getcurrentframeattributes-arframerequest-arframe
 	AR.onFrameDidUpdate(() => {
-
-      const { lightEstimation, rawFeaturePoints, capturedDepthData, anchors } = AR.getCurrentFrame({
-        lightEstimation: true,
-        rawFeaturePoints: true,
-        capturedDepthData: true,
-        anchors: {},
-      });
-      if(!_.isEmpty(rawFeaturePoints)) {
-          //console.log('rawFeaturePoints: ', rawFeaturePoints);
-           return true;
-        }
-
-      if(!_.isEmpty(lightEstimation)) {
-          //console.log('lightEstimation: ', lightEstimation);
-           return true;
-        }
-
-      if(!_.isEmpty(capturedDepthData)) {
-          console.log('capturedDepthData: ', capturedDepthData);
-           return true;
-        }
-
-      if(!_.isEmpty(anchors)) {
-          //console.log('anchors: ', anchors);
-           return true;
-        }
+    const { lightEstimation, rawFeaturePoints, capturedDepthData } = AR.getCurrentFrame({
+      lightEstimation: true,
+      rawFeaturePoints: true,
+      capturedDepthData: true
     });
-  return false;
+  });
+}
 
+
+
+
+export const getPlaneAnchor = () => {
+	// https://docs.expo.io/versions/v31.0.0/sdk/AR#getcurrentframeattributes-arframerequest-arframe
+	handlePlane = (anchor, eventType) => {
+    console.log(anchor)
+    console.log('eventType: ', eventType);
+    if (eventType === AR.AnchorEventTypes.Add) {
+      // Something added!
+    } else if (eventType === AR.AnchorEventTypes.Remove) {
+      // Now it's changed
+    } else if (eventType === AR.AnchorEventTypes.Update) {
+      console.log('update')
+    }
+  };
+
+
+		AR.onAnchorsDidUpdate(({ anchors, eventType }) => {
+      console.log('anchors did update');
+      for (let anchor of anchors) {
+        console.log('handle anchor:', anchor.type);
+        switch (anchor.type) {
+          case AR.AnchorTypes.Anchor:
+            console.log('anchor');
+            break;
+          case AR.AnchorTypes.Plane:
+            return handlePlane(anchor, eventType);
+            break;
+          case AR.AnchorTypes.Face:
+            console.log('face');
+            break;
+          case AR.AnchorTypes.Image:
+            console.log('image');
+            break;
+          default:
+            break;
+        }
+      }
+    });
 }

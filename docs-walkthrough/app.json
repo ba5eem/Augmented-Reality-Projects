@@ -2,7 +2,7 @@
   "expo": {
     "name": "image recog",
     "description": "image recog",
-    "slug": "yandhi",
+    "slug": "image",
     "privacy": "public",
     "sdkVersion": "29.0.0",
     "version": "1.0.0",
