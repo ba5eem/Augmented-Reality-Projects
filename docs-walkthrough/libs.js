@@ -51,9 +51,6 @@ export const getCurrentFrame = () => {
   });
 }
 
-
-
-
 export const getPlaneAnchor = () => {
 	// https://docs.expo.io/versions/v31.0.0/sdk/AR#getcurrentframeattributes-arframerequest-arframe
 	handlePlane = (anchor, eventType) => {

@@ -8,11 +8,21 @@ import { clear } from './ClearScreen.js';
 const _ = require('lodash');
 clear();
 
+
+
 const cyan = (arg) => {
     let bgCyan = '\x1b[46m%s\x1b[0m';
     console.log(bgCyan,bgCyan,bgCyan,bgCyan,bgCyan,arg);
 };
 cyan(ArrayMethods.length);
+
+
+// Make a cube - notice that each unit is 1 meter in real life, we will make our box 0.1 meters
+const geometry = new THREE.BoxGeometry(2, 2, 2);
+// Simple color material
+const material = new THREE.MeshPhongMaterial({
+  color: 0xff00ff,
+});
 
 
 // review all lib function on libs.js file
@@ -77,7 +87,7 @@ class MainScreen extends React.Component {
     AR.setPlaneDetection(AR.PlaneDetectionTypes.Horizontal);
 
     lib.HitTestResultTypes('VerticalPlane'); // libs.js line: 35
-
+    lib.getPlaneAnchor(); // check commit history for example: ARPlaneAnchor - libs.js line: 54
     // Create a 3D renderer
     this.renderer = new ExpoTHREE.Renderer({
       gl,
@@ -93,64 +103,12 @@ class MainScreen extends React.Component {
     // Now we make a camera that matches the device orientation. 
     // Ex: When we look down this camera will rotate to look down too!
     this.camera = new ThreeAR.Camera(width, height, 0.01, 1000);
-    
-    // Make a cube - notice that each unit is 1 meter in real life, we will make our box 0.1 meters
-    const geometry = new THREE.BoxGeometry(2, 2, 2);
-    // Simple color material
-    const material = new THREE.MeshPhongMaterial({
-      color: 0xff00ff,
-    });
-    
     // Combine our geometry and material
     this.cube = new THREE.Mesh(geometry, material);
     // Place the box 0.4 meters in front of us.
     this.cube.position.z = -10
     // Add the cube to the scene
-
-
-    handlePlane = (anchor, eventType) => {
-      console.log(anchor)
-      console.log('eventType: ', eventType);
-      if (eventType === AR.AnchorEventTypes.Add) {
-        // Something added!
-        console.log('oallala')
-        this.setState({
-          data: true
-        })
-      } else if (eventType === AR.AnchorEventTypes.Remove) {
-        // Now it's changed
-      } else if (eventType === AR.AnchorEventTypes.Update) {
-        // Now it's gone...
-        console.log('update')
-        this.scene.add(this.cube);
-        
-      }
-    };
-
-
-    AR.onAnchorsDidUpdate(({ anchors, eventType }) => {
-      console.log('anchors did update');
-      for (let anchor of anchors) {
-        console.log('handle anchor:', anchor.type);
-        switch (anchor.type) {
-          case AR.AnchorTypes.Anchor:
-            console.log('anchor');
-            break;
-          case AR.AnchorTypes.Plane:
-            handlePlane(anchor, eventType);
-            break;
-          case AR.AnchorTypes.Face:
-            console.log('face');
-            break;
-          case AR.AnchorTypes.Image:
-            console.log('image');
-            break;
-          default:
-            break;
-        }
-      }
-    });
-    
+    this.scene.add(this.cube);
     // Setup a light so we can see the cube color
     // AmbientLight colors all things in the scene equally.
     this.scene.add(new THREE.AmbientLight(0xffffff));
