@@ -9,76 +9,54 @@ import { clear } from './ClearScreen.js';
 const _ = require('lodash');
 clear();
 
-
-
-const cyan = (arg) => {
-    let bgCyan = '\x1b[46m%s\x1b[0m';
-    console.log(bgCyan,bgCyan,bgCyan,bgCyan,bgCyan,arg);
-};
-cyan(ArrayMethods.length);
-
-
-// Make a cube - notice that each unit is 1 meter in real life, we will make our box 0.1 meters
-const geometry = new THREE.BoxGeometry(2, 2, 2);
-// Simple color material
-const material = new THREE.MeshPhongMaterial({
-  color: 0xff00ff,
-});
-
-
-// review all lib function on libs.js file
-// I moved into seperate file so it wasnt so crammed here
-// Each function has link to docs for further analysis
-// Detection Image please look at Branch: imageDetection for example
-
-class MainScreen extends React.Component {
+export default class MainScreen extends React.Component {
   constructor(props){
     super(props);
 
     this.state = {
-      docs: false
+      data: true
     }
   }
+  touch = new THREE.Vector2();
+  raycaster = new THREE.Raycaster();
 
+  updateTouch = (e) => {
+    let x = e.locationX;
+    let y = e.locationY;
+    console.log(Object.keys(e))
+    this.touch.x = x / 375 * 2 - 1;
+    this.touch.y = -(y / 812) * 2 + 1;
+    //this.runHitTest();
+  };
 
+  runHitTest = () => {
+    this.raycaster.setFromCamera(this.touch, this.camera);
+    const intersects = this.raycaster.intersectObjects(this.planes.children);
+    for (const intersect of intersects) {
+      const { distance, face, faceIndex, object, point, uv } = intersect;
+      this.sphere.position.set(point.x, point.y, point.z);
+      this.sphere.visible = true;
+    }
+  };
 
-  
-
-
-  async componentDidMount() {
-    THREE.suppressExpoWarnings(true)
-
-
-    let isARvailable = await AR.isAvailable(); //  https://docs.expo.io/versions/v31.0.0/sdk/AR#isavailable
-    let getVersion = await AR.getVersion(); // https://docs.expo.io/versions/v31.0.0/sdk/AR#getversion
-
-    lib.onFrameDidUpdate(); // libs.js line: 6
-    lib.onCameraDidChangeTrackingState(); // libs.js line: 19
-    lib.getCurrentFrame() // libs.js line 43
-
-    AR.onDidFailWithError(({ err }) => { console.log(err) });
-    // https://docs.expo.io/versions/v31.0.0/sdk/AR#ondidfailwitherror--error----
-    AR.onSessionWasInterrupted(() => { console.log("interrupted") });
-    // https://docs.expo.io/versions/v31.0.0/sdk/AR#onsessionwasinterrupted----
-    AR.onSessionInterruptionEnded(() => { console.log('interruption over') });
-    // https://docs.expo.io/versions/v31.0.0/sdk/AR#onsessioninterruptionended----
-
+  componentWillMount() {
+    THREE.suppressExpoWarnings(true);
+  }
+  componentWillUnmount() {
+    THREE.suppressExpoWarnings(false);
   }
 
 
-
-
-  
   render() {
-    const world = AR.TrackingConfigurations.World;
-    const face = AR.TrackingConfigurations.face;
-
+    // Create an `ExpoGraphics.GLView` covering the whole screen, tell it to call our
+    // `onContextCreate` function once it's initialized.
     return (
       <TouchableView
         style={{ flex: 1 }}
-        shouldCancelWhenOutside={false}
-        onTouchesBegan={this.onTouchesBegan}>
-
+        onTouchesBegan={(e)=>this.updateTouch(e)}
+        onTouchesMoved={({ locationX, locationY }) =>
+          this.updateTouch({ x: locationX, y: locationY })}
+        onTouchesEnded={() => console.log('ended')}>
         <GraphicsView
           style={{ flex: 1 }}
           onContextCreate={this.onContextCreate}
@@ -87,32 +65,14 @@ class MainScreen extends React.Component {
           isArEnabled
           isArRunningStateEnabled
           isArCameraStateEnabled
-          arTrackingConfiguration={world}/>
-
-
+          arTrackingConfiguration={AR.TrackingConfigurations.World}
+        />
       </TouchableView>
     );
   }
 
-  onContextCreate = async event => {
-    this.arSetup();
-    this.commonSetup(event);
-  }
+  onContextCreate = async ({ gl, canvas, width, height, scale: pixelRatio }) => {
 
-  arSetup = () => {
-    AR.setPlaneDetection(AR.PlaneDetectionTypes.Horizontal);
-    // https://docs.expo.io/versions/v31.0.0/sdk/AR#plane-detection
-    // not quite what i was hoping for - but very easy to setup.
-    // to see code example, look at commit: setPlaneDetection
-  }
-
-  // When our context is built we can start coding 3D things.
-  commonSetup = ({ gl, scale: pixelRatio, width, height }) => {
-    // This will allow ARKit to collect Horizontal surfaces
-
-    //lib.HitTestResultTypes('VerticalPlane'); // libs.js line: 35
-    //lib.getPlaneAnchor(); // check commit history for example: ARPlaneAnchor - libs.js line: 54
-    // Create a 3D renderer
     this.renderer = new ExpoTHREE.Renderer({
       gl,
       pixelRatio,
@@ -124,66 +84,42 @@ class MainScreen extends React.Component {
 
     this.scene = new THREE.Scene();
     this.scene.background = new ThreeAR.BackgroundTexture(this.renderer);
+
     this.camera = new ThreeAR.Camera(width, height, 0.01, 1000);
+    console.log(width, height)
+
+    const inch = 0.0254;
+    const geometry = new THREE.BoxGeometry(2, 2, 2);
+    // Simple color material
+    const material = new THREE.MeshPhongMaterial({
+      color: 0xff00ff,
+    });
+    
+    // Combine our geometry and material
+    this.cube = new THREE.Mesh(geometry, material);
+    // Add the cube to the scene
+    this.cube.position.z = -10;
+    this.scene.add(this.cube);
+    this.cube = this.cube;
+
 
   };
 
-  // When the phone rotates, or the view changes size, this method will be called.
-  onResize = ({ x, y, scale, width, height }) => {
+
+
+  onResize = ({ width, height, scale }) => {
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
     this.renderer.setPixelRatio(scale);
     this.renderer.setSize(width, height);
   };
 
-  // Called every frame.
   onRender = () => {
+    if (this.arSession) {
+      this.points.updateWithSession(this.arSession);
+      this.planes.updateWithSession(this.arSession);
+    }
+
     this.renderer.render(this.scene, this.camera);
   };
-
-
-  onTouchesBegan = async ({ locationX: x, locationY: y }) => {
-    if (!this.renderer) {
-      return;
-    }
-
-    const size = this.renderer.getSize();
-    console.log('touch', { x, y, ...size });
-
-    const { hitTest } = await AR.performHitTest(
-      {
-        x: x / size.width,
-        y: y / size.height,
-      },
-      AR.HitTestResultTypes.HorizontalPlane
-    );
-    //console.log(hitTest);
-    for (let hit of hitTest) {
-      console.log('fired- ------>', hit)
-      const { worldTransform } = hit;
-      if (this.cube) {
-        console.log('remove;)')
-        this.scene.remove(this.cube);
-      }
-
-      const geometry = new THREE.BoxGeometry(0.0254, 0.0254, 0.0254);
-      const material = new THREE.MeshBasicMaterial({
-        color: 0x00ff00,
-      });
-
-      this.cube = new THREE.Mesh(geometry, material);
-      this.scene.add(this.cube);
-      this.cube.matrixAutoUpdate = false;
-
-      const matrix = new THREE.Matrix4();
-      matrix.fromArray(worldTransform);
-
-      this.cube.applyMatrix(matrix);
-      this.cube.updateMatrix();
-    }
-  };
-
 }
-
-
-export default MainScreen;
