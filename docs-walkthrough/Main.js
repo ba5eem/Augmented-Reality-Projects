@@ -4,6 +4,7 @@ import ExpoTHREE, { AR as ThreeAR, THREE } from 'expo-three';
 import { View as GraphicsView } from 'expo-graphics';
 import * as lib from './libs';
 import {AR as ArrayMethods} from './AR-Object-Methods';
+import TouchableView from './TouchableView';
 import { clear } from './ClearScreen.js';
 const _ = require('lodash');
 clear();
@@ -69,60 +70,48 @@ class MainScreen extends React.Component {
 
   
   render() {
+    const world = AR.TrackingConfigurations.World;
+    const face = AR.TrackingConfigurations.face;
 
     return (
-      <GraphicsView
+      <TouchableView
         style={{ flex: 1 }}
-        onContextCreate={this.onContextCreate}
-        onRender={this.onRender}
-        onResize={this.onResize}
-        isArEnabled
-        isArRunningStateEnabled
-        isArCameraStateEnabled
-        arTrackingConfiguration={AR.TrackingConfigurations.World}
-      />
+        shouldCancelWhenOutside={false}
+        onTouchesBegan={this.onTouchesBegan}>
+
+        <GraphicsView
+          style={{ flex: 1 }}
+          onContextCreate={this.onContextCreate}
+          onRender={this.onRender}
+          onResize={this.onResize}
+          isArEnabled
+          isArRunningStateEnabled
+          isArCameraStateEnabled
+          arTrackingConfiguration={world}/>
+
+
+      </TouchableView>
     );
   }
 
-  // When our context is built we can start coding 3D things.
-  onContextCreate = async ({ gl, scale: pixelRatio, width, height }) => {
-    // This will allow ARKit to collect Horizontal surfaces
+  onContextCreate = async event => {
+    this.arSetup();
+    this.commonSetup(event);
+  }
 
+  arSetup = () => {
     AR.setPlaneDetection(AR.PlaneDetectionTypes.Horizontal);
-
     // https://docs.expo.io/versions/v31.0.0/sdk/AR#plane-detection
     // not quite what i was hoping for - but very easy to setup.
+    // to see code example, look at commit: setPlaneDetection
+  }
 
-    AR.onAnchorsDidUpdate(({ anchors, eventType }) => {
-      console.log('anchors did update');
-      for (let anchor of anchors) {
-        console.log('handle anchor:', anchor.type);
-        switch (anchor.type) {
-          case AR.AnchorTypes.Anchor:
-            console.log('anchor');
-            break;
-          case AR.AnchorTypes.Plane:
-            console.log('plane detected');
-            break;
-          case AR.AnchorTypes.Face:
-            console.log('face');
-            break;
-          case AR.AnchorTypes.Image:
-            console.log('image');
-            break;
-          default:
-            break;
-        }
-      }
-    });
+  // When our context is built we can start coding 3D things.
+  commonSetup = ({ gl, scale: pixelRatio, width, height }) => {
+    // This will allow ARKit to collect Horizontal surfaces
 
-
-
-
-
-
-    lib.HitTestResultTypes('VerticalPlane'); // libs.js line: 35
-    lib.getPlaneAnchor(); // check commit history for example: ARPlaneAnchor - libs.js line: 54
+    //lib.HitTestResultTypes('VerticalPlane'); // libs.js line: 35
+    //lib.getPlaneAnchor(); // check commit history for example: ARPlaneAnchor - libs.js line: 54
     // Create a 3D renderer
     this.renderer = new ExpoTHREE.Renderer({
       gl,
@@ -131,42 +120,16 @@ class MainScreen extends React.Component {
       height,
     });
 
-    // We will add all of our meshes to this scene.
+
+
     this.scene = new THREE.Scene();
-    // This will create a camera texture and use it as the background for our scene
     this.scene.background = new ThreeAR.BackgroundTexture(this.renderer);
-    // Now we make a camera that matches the device orientation. 
-    // Ex: When we look down this camera will rotate to look down too!
     this.camera = new ThreeAR.Camera(width, height, 0.01, 1000);
-    // Combine our geometry and material
-    this.cube = new THREE.Mesh(geometry, material);
-    // Place the box 0.4 meters in front of us.
-    this.cube.position.z = -10
-    // Add the cube to the scene
-    this.scene.add(this.cube);
-    // Setup a light so we can see the cube color
-    // AmbientLight colors all things in the scene equally.
-    this.scene.add(new THREE.AmbientLight(0xffffff));
-
-    // Create this cool utility function that let's us see all the raw data points.
-    this.points = new ThreeAR.Points();
-    // Add the points to our scene...
-    this.scene.add(this.points)
-
-
-
-
-
 
   };
 
   // When the phone rotates, or the view changes size, this method will be called.
   onResize = ({ x, y, scale, width, height }) => {
-
-    // Let's stop the function if we haven't setup our scene yet
-    if (!this.renderer) {
-      return;
-    }
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
     this.renderer.setPixelRatio(scale);
@@ -175,11 +138,51 @@ class MainScreen extends React.Component {
 
   // Called every frame.
   onRender = () => {
-    // This will make the points get more rawDataPoints from Expo.AR
-    this.points.update()
-    // Finally render the scene with the AR Camera
     this.renderer.render(this.scene, this.camera);
   };
+
+
+  onTouchesBegan = async ({ locationX: x, locationY: y }) => {
+    if (!this.renderer) {
+      return;
+    }
+
+    const size = this.renderer.getSize();
+    console.log('touch', { x, y, ...size });
+
+    const { hitTest } = await AR.performHitTest(
+      {
+        x: x / size.width,
+        y: y / size.height,
+      },
+      AR.HitTestResultTypes.HorizontalPlane
+    );
+    //console.log(hitTest);
+    for (let hit of hitTest) {
+      console.log('fired- ------>', hit)
+      const { worldTransform } = hit;
+      if (this.cube) {
+        console.log('remove;)')
+        this.scene.remove(this.cube);
+      }
+
+      const geometry = new THREE.BoxGeometry(0.0254, 0.0254, 0.0254);
+      const material = new THREE.MeshBasicMaterial({
+        color: 0x00ff00,
+      });
+
+      this.cube = new THREE.Mesh(geometry, material);
+      this.scene.add(this.cube);
+      this.cube.matrixAutoUpdate = false;
+
+      const matrix = new THREE.Matrix4();
+      matrix.fromArray(worldTransform);
+
+      this.cube.applyMatrix(matrix);
+      this.cube.updateMatrix();
+    }
+  };
+
 }
 
 
